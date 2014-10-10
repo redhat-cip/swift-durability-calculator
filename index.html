@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="http://netdna.bootstrapcdn.com/bootswatch/3.0.0/flatly/bootstrap.min.css" rel="stylesheet">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js"></script>
+</head>
+<body onload="calculate_probability();">
+    <div class="container">
+        <div class="col-lg-12">
+            <h1>Swift object durability calculator</h1>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="container">
+        <div class="col-lg-12">
+        <p>This tool can help to choose the required amount of replicas in a
+        Swift cluster, based on the wanted object durability. If you need a
+        lower risk to loose an object, you can increase the number of replicas
+        for objects in your cluster. You can even use different number of
+        replicas for different classes of data using <a
+        href="http://docs.openstack.org/developer/swift/overview_policies.html">Swift
+        Storage Policies</a>.</p>
+        <p>With the choosen parameters (see below), the calculated probability
+        to loose one object of 5GB size in a year is: <span id="p_max"></span>.
+        <hr />
+        </div>
+
+        <div class="col-lg-6">
+
+            <form class="form-horizontal" role="form">
+
+                <div class="form-group">
+                    <label for="replicas" class="col-lg-6 control-label">Number of replicas:</label>
+                    <div class="col-lg-3">
+                        <input type="number" id="replicas" value="3" min=1 class="form-control" onchange="calculate_probability()">
+                    </div>
+                </div>
+           
+                <div class="form-group">
+                    <label for="p_disk_failure_year" class="col-lg-6 control-label">Disk failure rate per year (in %):</label>
+                    <div class="col-lg-3">
+                        <input type="number" id="p_disk_failure_year" value="2.5" min=0 max=100 step=0.1 class="form-control" onchange="calculate_probability()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <p class="help-block col-lg-12">The disk failure rate per
+                    year corresponds to the MTBF of an disk. For example, a disk
+                    with a specified MTBF of 350.000 hours has a probability of
+                    nearly 2.5% to fail within one year. Most disk vendors
+                    specify a much higher MTBF, however in reality you will most
+                    likely see much higher disk failures per year.</p>
+                </div>
+ 
+
+                <div class="form-group">
+                    <label for="rebuild_time" class="col-lg-6 control-label">Rebuild time (hours):</label>
+                    <div class="col-lg-3">
+                        <input type="number" id="rebuild_time" value="9" min=0 class="form-control" onchange="calculate_probability()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <p class="help-block col-lg-12">The rebuild time will depend
+                    on the amount of data stored on the disks, the disk and
+                    network speed. For example, for a 4TB disk that is filled
+                    80% it takes around 9 hours to replicate data at 100
+                    MB/s.</p>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="ber" class="col-lg-6 control-label">Bit error rate:</label>
+                    <div class="col-lg-3">
+                        <input type="text" id="ber" value="1e-15" class="form-control" onchange="calculate_probability()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <p class="help-block col-lg-12">The bit error rate is the
+                    probability for an unrecoverable error per bit read. This is
+                    also the reason why the probability to loose an object
+                    increases with the object size. Modern drives have a
+                    specified bit error rate as low as 1e-15 or even 1e-16.</p>
+                </div>
+ 
+            </form>
+        </div>
+
+        <div class="col-lg-6">
+            <div id="placeholder" class="demo-placeholder" style="height: 500px; width:100%;"></div>
+        </div>
+    </div>
+
+    <script>
+        function calculate_probability() {
+            rebuild_time = document.getElementById("rebuild_time").value;
+            replicas = document.getElementById("replicas").value;
+            p_disk_failure_year = document.getElementById("p_disk_failure_year").value;
+    
+            p_disk_failure_year = p_disk_failure_year/100;
+            p_disk_failure_during_rebuild = p_disk_failure_year/8760*rebuild_time;
+    
+            var results = [];
+            
+            ber = document.getElementById("ber").value;
+    
+            for (obj_size=0;obj_size<=5000;obj_size+=100){
+                replicas = document.getElementById("replicas").value;
+                p_bit_rot = 1 - Math.pow((1-ber), 8 * obj_size*1000*1000);
+                p_loss = (1 - Math.pow((1-p_disk_failure_year), replicas)) + p_bit_rot;
+                replicas --;
+                while (replicas >= 1) { 
+                    p_loss *= (1-Math.pow((1-p_disk_failure_during_rebuild), replicas) + p_bit_rot);
+                    replicas --;
+                }
+                results.push([obj_size, p_loss.toString()]);
+            }
+   
+            $.plot("#placeholder", [results], {selection: {mode: "xy" }, 
+                xaxis: {
+                    tickFormatter: function(val, axis) {
+                        if ((val % 1000)  == 0) {
+                            return val + "<br /> MB";
+                        } else {
+                            return "";
+                        }
+                    }
+                },
+                yaxis: {
+                    tickFormatter: function(val, axis) {
+                        // Shorten the mantisse and apply a little bit of style
+                        return format_p(val);
+                   }
+                }
+            });
+    
+            $("#placeholder").bind("plothover");
+            
+            // Shorten the mantisse and apply a little bit of style
+            p_loss = "" + format_p(p_loss);
+           
+            // Add maximum loss probability to text
+            document.getElementById("p_max").innerHTML = p_loss.toString();
+        };
+
+        function format_p(val) {
+            var str = "" + val;  // ensure it is a string
+            var parts = str.split("e"); // split into mantisse and exponent
+            if (parts[1] != undefined) {
+                return "p = " + parts[0].substr(0,3) + " &middot; 10<sup>" + parts[1] + "</sup>";
+            }
+            else {
+                return "p = " + val;
+            }
+        };
+    </script>
+</body>
+</html>
