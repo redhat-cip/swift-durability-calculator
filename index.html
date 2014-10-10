@@ -59,16 +59,15 @@
                 <div class="form-group">
                     <label for="rebuild_time" class="col-lg-6 control-label">Rebuild time (hours):</label>
                     <div class="col-lg-3">
-                        <input type="number" id="rebuild_time" value="9" min=0 class="form-control" onchange="calculate_probability()">
+                        <input type="number" id="rebuild_time" value="1" min=0 class="form-control" onchange="calculate_probability()">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <p class="help-block col-lg-12">The rebuild time will depend
-                    on the amount of data stored on the disks, the disk and
-                    network speed. For example, for a 4TB disk that is filled
-                    80% it takes around 9 hours to replicate data at 100
-                    MB/s.</p>
+                    <p class="help-block col-lg-12">The rebuild time depends
+                    on the amount of data stored on the disks, the disk size,
+                    network speed, partition power and total number of disks in
+                    the cluster.</p>
                 </div>
 
 
