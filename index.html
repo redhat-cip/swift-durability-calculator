@@ -109,10 +109,12 @@
             for (obj_size=0;obj_size<=5000;obj_size+=100){
                 replicas = document.getElementById("replicas").value;
                 p_bit_rot = 1 - Math.pow((1-ber), 8 * obj_size*1000*1000);
-                p_loss = (1 - Math.pow((1-p_disk_failure_year), replicas)) + p_bit_rot;
+                p_disk_failure = (1 - Math.pow((1-p_disk_failure_year), replicas))
+                p_loss = p_disk_failure + (1 - p_disk_failure) * p_bit_rot;
                 replicas --;
                 while (replicas >= 1) { 
-                    p_loss *= (1-Math.pow((1-p_disk_failure_during_rebuild), replicas) + p_bit_rot);
+                    p_disk_failure = (1 - Math.pow((1-p_disk_failure_during_rebuild), replicas))
+                    p_loss *= (p_disk_failure + (1 - p_disk_failure) * p_bit_rot);
                     replicas --;
                 }
                 results.push([obj_size, p_loss.toString()]);
