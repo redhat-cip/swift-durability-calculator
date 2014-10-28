@@ -5,6 +5,7 @@
     <link href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </head>
 <body onload="calculate_probability();">
     <div class="container">
@@ -91,6 +92,366 @@
         <div class="col-lg-6">
             <div id="placeholder" class="demo-placeholder" style="height: 500px; width:100%;"></div>
         </div>
+
+    </div>
+        <div class="container">
+        <div class="col-lg-12">
+
+            <hr />
+            <h2>Probability calculation</h2>
+
+            <table class="table">
+
+            <tr>
+            <td>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mi>s</mi>
+            </math>
+            </td>
+            <td>Object size in bytes</td>
+            </tr>
+
+            <tr>
+            <td>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>t</mi>
+                    <mrow><mi>rebuild</mi></mrow>
+                </msub>
+            </math>
+            </td>
+            <td>Rebuild time in hours</td>
+            </tr>
+
+            <tr>
+            <td>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>p</mi>
+                    <mrow><mi>AFR</mi></mrow>
+                </msub>
+            </math>
+            </td>
+            <td>Annual Failure Rate. Probability for a disk failure in one year</td>
+            </tr>
+
+            <tr>
+            <td>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi> p </mi>
+                    <mrow><mi>RFR</mi></mrow>
+                </msub>
+                <mo> = </mo>
+                <msub>
+                    <mi> p </mi>
+                    <mrow><mi>AFR</mi></mrow>
+                </msub>
+                <mfrac>
+                <msub>
+                    <mi>t</mi>
+                    <mrow><mi>rebuild</mi></mrow>
+                </msub>
+                    <mi>8760</mi>
+                </mfrac>
+
+            </math>
+            </td>
+            <td>Rebuild Failure Rate. Probability for a disk failure during rebuild</td>
+            </tr>
+
+            <tr>
+            <td>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi> p </mi>
+                    <mrow><mi>BER</mi></mrow>
+                </msub>
+
+            </math>
+            </td>
+            <td>Probability for an unrecoverable error per bit read</td>
+            </tr>
+            </table>
+
+            <hr />
+
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>p</mi>
+                    <mrow><mi>loss</mi></mrow>
+                </msub>
+
+                <mo> = </mo>
+
+                <munder>
+                    <mrow>
+                    <mo>(</mo>
+
+
+                <mover>
+                    <mrow>
+                    <msub>
+                        <mrow>
+                        <mn>3</mn>
+                        <mo>&sdot;</mo>
+                        <mi>p</mi>
+                        </mrow>
+                        <mrow><mi>AFR</mi></mrow>
+                    </msub>
+                    <msup>
+                        <mrow>
+                            <mo>&sdot;</mo>
+                            <mi>(1</mi>
+                            <mo> - </mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>AFR</mi>
+                            </msub>
+                            <mo> ) </mo>
+                        </mrow>
+                        <mrow>
+                        <mi>2</mi>
+                        </mrow>
+                    </msup>
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>1 out of 3 disks failed</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                </mover>
+
+                    <mo>+</mo>
+
+                    <mover>
+                    <mrow>
+                    <msup>
+                    <mrow>
+                    <mo>(</mo>
+                    <mn>1</mn>
+                    <mo>-</mo>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow><mi>AFR</mi></mrow>
+                    </msub>
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                    <mn>3</mn>
+                    </msup>
+
+                    <mo>&sdot;</mo>
+                     <msub>
+                        <mi>p</mi>
+                        <mrow><mi>BER</mi></mrow>
+                    </msub>
+
+                    <mo>&sdot;</mo>
+                    <mn>8</mn>
+                    <mo>&sdot;</mo>
+                    <mi>s</mi>
+
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>Unrecoverable Read Error</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                    </mover>
+
+
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <munder>
+                            <mrow>
+                                <mo>&UnderBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>1st replica loss</mtext>
+                            </mrow>
+                        </munder>
+                    </mrow>
+                </munder>
+
+                <mo>&sdot;</mo>
+
+                <munder>
+                    <mrow>
+                    <mo>(</mo>
+
+                <mover>
+                    <mrow>
+                    <msub>
+                        <mrow>
+                        <mn>2</mn>
+                        <mo>&sdot;</mo>
+                        <mi>p</mi>
+                        </mrow>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                            <mo>&sdot;</mo>
+                            <mi>(1</mi>
+                            <mo> - </mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>RFR</mi>
+                            </msub>
+                            <mo> ) </mo>
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>1 out of 2 disks failed</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                </mover>
+
+                    <mo>+</mo>
+
+                    <mover>
+                    <mrow>
+                    <msup>
+                    <mrow>
+                    <mo>(</mo>
+                    <mn>1</mn>
+                    <mo>-</mo>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <mn>2</mn>
+                    </mrow>
+                    </msup>
+
+                    <mo>&sdot;</mo>
+                     <msub>
+                        <mi>p</mi>
+                        <mrow><mi>BER</mi></mrow>
+                    </msub>
+
+                    <mo>&sdot;</mo>
+                    <mn>8</mn>
+                    <mo>&sdot;</mo>
+                    <mi>s</mi>
+
+
+
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>Unrecoverable Read Error</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                    </mover>
+
+
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <munder>
+                            <mrow>
+                                <mo>&UnderBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>2nd replica loss</mtext>
+                            </mrow>
+                        </munder>
+                    </mrow>
+                </munder>
+
+                <mo>&sdot;</mo>
+
+                <munder>
+                    <mrow>
+                    <mo>(</mo>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <mo>+</mo>
+
+                    <mover>
+                    <mrow>
+                    <mo>(</mo>
+                    <mn>1</mn>
+                    <mo>-</mo>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <mo>)</mo>
+
+                    <mo>&sdot;</mo>
+                     <msub>
+                        <mi>p</mi>
+                        <mrow><mi>BER</mi></mrow>
+                    </msub>
+
+                    <mo>&sdot;</mo>
+                    <mn>8</mn>
+                    <mo>&sdot;</mo>
+                    <mi>s</mi>
+
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>Unrecoverable Read Error</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                    </mover>
+
+
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <munder>
+                            <mrow>
+                                <mo>&UnderBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>3rd replica loss</mtext>
+                            </mrow>
+                        </munder>
+                    </mrow>
+                </munder>
+
+
+            </math>
+
+
+
+
+    </div>
+    <hr />
     </div>
 
     <script>
@@ -109,17 +470,17 @@
             for (obj_size=0;obj_size<=5000;obj_size+=100){
                 replicas = document.getElementById("replicas").value;
                 p_bit_rot = 1 - Math.pow((1-ber), 8 * obj_size*1000*1000);
-                p_disk_failure = (1 - Math.pow((1-p_disk_failure_year), replicas))
-                p_loss = p_disk_failure + (1 - p_disk_failure) * p_bit_rot;
+                p_disk_failure = replicas * p_disk_failure_year * Math.pow((1-p_disk_failure_year), replicas-1)
+                p_loss = p_disk_failure + Math.pow((1 - p_disk_failure_year), replicas) * p_bit_rot;
                 replicas --;
                 while (replicas >= 1) { 
-                    p_disk_failure = (1 - Math.pow((1-p_disk_failure_during_rebuild), replicas))
-                    p_loss *= (p_disk_failure + (1 - p_disk_failure) * p_bit_rot);
+                    p_disk_failure = replicas * p_disk_failure_during_rebuild * Math.pow((1-p_disk_failure_during_rebuild), replicas-1)
+                    p_loss *= (p_disk_failure + Math.pow((1 - p_disk_failure_during_rebuild), replicas) * p_bit_rot);
                     replicas --;
                 }
                 results.push([obj_size, p_loss.toString()]);
             }
-   
+
             $.plot("#placeholder", [results], {selection: {mode: "xy" }, 
                 xaxis: {
                     tickFormatter: function(val, axis) {
