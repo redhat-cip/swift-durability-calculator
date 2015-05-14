@@ -472,24 +472,28 @@
     </div>
 
     <script>
+        function toggle_input_element(display_elements){
+	    input_elements = ["replicas", "ndata", "nparity"];
+            for (var i=0; i < input_elements.length; i++){
+		    element = input_elements[i];
+		    if (display_elements.indexOf(element)>=0){
+                        document.getElementById(element).style.display = '';
+                        document.getElementById(element+'_label').style.display = '';
+		    }else{
+                        document.getElementById(element).style.display = 'none';
+                        document.getElementById(element+'_label').style.display = 'none';
+		    }
+
+            }
+        }
         function change_policy(policy) {
 	    switch(policy){
 		case 'replica-policy':
-                    document.getElementById("replicas").style.display = '';
-                    document.getElementById("replicas_label").style.display = '';
-                    document.getElementById("ndata").style.display = 'none';
-                    document.getElementById("ndata_label").style.display = 'none';
-                    document.getElementById("nparity").style.display = 'none';
-                    document.getElementById("nparity_label").style.display = 'none';
-	            break;
+		    toggle_input_element(["replicas"]);
+                    break;
 		case 'ec-policy':
-                    document.getElementById("replicas").style.display = 'none';
-                    document.getElementById("replicas_label").style.display = 'none';
-                    document.getElementById("ndata").style.display = '';
-                    document.getElementById("ndata_label").style.display = '';
-                    document.getElementById("nparity").style.display = '';
-                    document.getElementById("nparity_label").style.display = '';
-	            break;
+		    toggle_input_element(["ndata", "nparity"]);
+                    break;
 	    }
 	}
 
@@ -508,36 +512,39 @@
             ber = document.getElementById("ber").value;
 
             for (obj_size=0;obj_size<=5000;obj_size+=100){
-                if (policy=="replica-policy"){
-		    // Replica case
-                    replicas = document.getElementById("replicas").value;
-                    p_bit_rot = 1 - Math.pow((1-ber), 8 * obj_size*1000*1000);
-                    p_disk_failure = replicas * p_disk_failure_year * Math.pow((1-p_disk_failure_year), replicas-1)
-                    p_loss = p_disk_failure + Math.pow((1 - p_disk_failure_year), replicas) * p_bit_rot;
-                    replicas --;
-                    while (replicas >= 1) {
-                        p_disk_failure = replicas * p_disk_failure_during_rebuild * Math.pow((1-p_disk_failure_during_rebuild), replicas-1)
-                        p_loss *= (p_disk_failure + Math.pow((1 - p_disk_failure_during_rebuild), replicas) * p_bit_rot);
-                        replicas --;
-                    }
-                    results.push([obj_size, p_loss.toString()]);
-                }else if (policy=="ec-policy"){
-		    // EC case
-                    ndata = document.getElementById("ndata").value;
-                    nparity = document.getElementById("nparity").value;
-                    total = ndata + nparity;
-                    p_bit_rot = 1 - Math.pow((1-ber), 8 * obj_size*1000*1000);
-                    p_disk_failure = total * p_disk_failure_year * Math.pow((1-p_disk_failure_year), total-1)
-                    p_loss = p_disk_failure + Math.pow((1 - p_disk_failure_year), nparity) * p_bit_rot;
-                    nparity --;
-                    while (nparity >= 0) {
-			total = ndata + nparity;
-                        p_disk_failure = total * p_disk_failure_during_rebuild * Math.pow((1-p_disk_failure_during_rebuild), total-1)
-                        p_loss *= (p_disk_failure + Math.pow((1 - p_disk_failure_during_rebuild), nparity) * p_bit_rot);
-                        nparity --;
-                    }
-                    results.push([obj_size, p_loss.toString()]);
-		}
+                    switch (policy){
+		        // Replica case
+		        case "replica-policy":
+                            replicas = document.getElementById("replicas").value;
+                            p_bit_rot = 1 - Math.pow((1-ber), 8 * obj_size*1000*1000);
+                            p_disk_failure = replicas * p_disk_failure_year * Math.pow((1-p_disk_failure_year), replicas-1)
+                            p_loss = p_disk_failure + Math.pow((1 - p_disk_failure_year), replicas) * p_bit_rot;
+                            replicas --;
+                            while (replicas >= 1) {
+                                p_disk_failure = replicas * p_disk_failure_during_rebuild * Math.pow((1-p_disk_failure_during_rebuild), replicas-1)
+                                p_loss *= (p_disk_failure + Math.pow((1 - p_disk_failure_during_rebuild), replicas) * p_bit_rot);
+                                replicas --;
+                            }
+                            results.push([obj_size, p_loss.toString()]);
+			    break;
+                         // EC case
+                         case "ec-policy":
+                             ndata = document.getElementById("ndata").value;
+                             nparity = document.getElementById("nparity").value;
+                             total = ndata + nparity;
+                             p_bit_rot = 1 - Math.pow((1-ber), 8 * obj_size*1000*1000);
+                             p_disk_failure = total * p_disk_failure_year * Math.pow((1-p_disk_failure_year), total-1)
+                             p_loss = p_disk_failure + Math.pow((1 - p_disk_failure_year), nparity) * p_bit_rot;
+                             nparity --;
+                             while (nparity >= 0) {
+                                 total = ndata + nparity;
+                                 p_disk_failure = total * p_disk_failure_during_rebuild * Math.pow((1-p_disk_failure_during_rebuild), total-1)
+                                 p_loss *= (p_disk_failure + Math.pow((1 - p_disk_failure_during_rebuild), nparity) * p_bit_rot);
+                                 nparity --;
+                             }
+                             results.push([obj_size, p_loss.toString()]);
+                             break;
+                }
             }
 
             $.plot("#placeholder", [results], {selection: {mode: "xy" },
