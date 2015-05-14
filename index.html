@@ -35,12 +35,29 @@
             <form class="form-horizontal" role="form">
 
                 <div class="form-group">
-                    <label for="replicas" class="col-lg-6 control-label">Number of replicas:</label>
+                    <label for="policy" class="col-lg-6 control-label">Policy</label>
+                    <div class="col-lg-3">
+                    <select id="policy" onchange="calculate_probability()">
+                        <option value="replica-policy" selected>Replica</option>
+                        <option value="ec-policy">ErasureCode</option>
+                    </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="replicas" id="replicas_label" class="col-lg-6 control-label">Number of replicas:</label>
                     <div class="col-lg-3">
                         <input type="number" id="replicas" value="3" min=1 class="form-control" onchange="calculate_probability()">
                     </div>
+                    <label for="ndata" id="ndata_label" class="col-lg-6 control-label">Number of data fragments:</label>
+                    <div class="col-lg-3">
+                        <input type="number" id="ndata" value="3" min=1 class="form-control" onchange="calculate_probability()">
+                    </div>
+                    <label for="nparity" id="nparity_label" class="col-lg-6 control-label">Number of parity fragments:</label>
+                    <div class="col-lg-3">
+                        <input type="number" id="nparity" value="3" min=1 class="form-control" onchange="calculate_probability()">
+                    </div>
                 </div>
-           
+
                 <div class="form-group">
                     <label for="p_disk_failure_year" class="col-lg-6 control-label">Disk failure rate per year (in %):</label>
                     <div class="col-lg-3">
@@ -55,7 +72,7 @@
                     specify a much higher MTBF, however in reality you will most
                     likely see much higher disk failures per year.</p>
                 </div>
- 
+
 
                 <div class="form-group">
                     <label for="rebuild_time" class="col-lg-6 control-label">Rebuild time (hours):</label>
@@ -85,7 +102,7 @@
                     increases with the object size. Modern drives have a
                     specified bit error rate as low as 1e-15 or even 1e-16.</p>
                 </div>
- 
+
             </form>
         </div>
 
@@ -455,33 +472,75 @@
     </div>
 
     <script>
+        function change_policy(policy) {
+	    switch(policy){
+		case 'replica-policy':
+                    document.getElementById("replicas").style.display = '';
+                    document.getElementById("replicas_label").style.display = '';
+                    document.getElementById("ndata").style.display = 'none';
+                    document.getElementById("ndata_label").style.display = 'none';
+                    document.getElementById("nparity").style.display = 'none';
+                    document.getElementById("nparity_label").style.display = 'none';
+	            break;
+		case 'ec-policy':
+                    document.getElementById("replicas").style.display = 'none';
+                    document.getElementById("replicas_label").style.display = 'none';
+                    document.getElementById("ndata").style.display = '';
+                    document.getElementById("ndata_label").style.display = '';
+                    document.getElementById("nparity").style.display = '';
+                    document.getElementById("nparity_label").style.display = '';
+	            break;
+	    }
+	}
+
         function calculate_probability() {
+            policy = document.getElementById("policy").value;
+            change_policy(policy);
             rebuild_time = document.getElementById("rebuild_time").value;
             replicas = document.getElementById("replicas").value;
             p_disk_failure_year = document.getElementById("p_disk_failure_year").value;
-    
+
             p_disk_failure_year = p_disk_failure_year/100;
             p_disk_failure_during_rebuild = p_disk_failure_year/8760*rebuild_time;
-    
+
             var results = [];
-            
+
             ber = document.getElementById("ber").value;
-    
+
             for (obj_size=0;obj_size<=5000;obj_size+=100){
-                replicas = document.getElementById("replicas").value;
-                p_bit_rot = 1 - Math.pow((1-ber), 8 * obj_size*1000*1000);
-                p_disk_failure = replicas * p_disk_failure_year * Math.pow((1-p_disk_failure_year), replicas-1)
-                p_loss = p_disk_failure + Math.pow((1 - p_disk_failure_year), replicas) * p_bit_rot;
-                replicas --;
-                while (replicas >= 1) { 
-                    p_disk_failure = replicas * p_disk_failure_during_rebuild * Math.pow((1-p_disk_failure_during_rebuild), replicas-1)
-                    p_loss *= (p_disk_failure + Math.pow((1 - p_disk_failure_during_rebuild), replicas) * p_bit_rot);
+                if (policy=="replica-policy"){
+		    // Replica case
+                    replicas = document.getElementById("replicas").value;
+                    p_bit_rot = 1 - Math.pow((1-ber), 8 * obj_size*1000*1000);
+                    p_disk_failure = replicas * p_disk_failure_year * Math.pow((1-p_disk_failure_year), replicas-1)
+                    p_loss = p_disk_failure + Math.pow((1 - p_disk_failure_year), replicas) * p_bit_rot;
                     replicas --;
-                }
-                results.push([obj_size, p_loss.toString()]);
+                    while (replicas >= 1) {
+                        p_disk_failure = replicas * p_disk_failure_during_rebuild * Math.pow((1-p_disk_failure_during_rebuild), replicas-1)
+                        p_loss *= (p_disk_failure + Math.pow((1 - p_disk_failure_during_rebuild), replicas) * p_bit_rot);
+                        replicas --;
+                    }
+                    results.push([obj_size, p_loss.toString()]);
+                }else if (policy=="ec-policy"){
+		    // EC case
+                    ndata = document.getElementById("ndata").value;
+                    nparity = document.getElementById("nparity").value;
+                    total = ndata + nparity;
+                    p_bit_rot = 1 - Math.pow((1-ber), 8 * obj_size*1000*1000);
+                    p_disk_failure = total * p_disk_failure_year * Math.pow((1-p_disk_failure_year), total-1)
+                    p_loss = p_disk_failure + Math.pow((1 - p_disk_failure_year), nparity) * p_bit_rot;
+                    nparity --;
+                    while (nparity >= 0) {
+			total = ndata + nparity;
+                        p_disk_failure = total * p_disk_failure_during_rebuild * Math.pow((1-p_disk_failure_during_rebuild), total-1)
+                        p_loss *= (p_disk_failure + Math.pow((1 - p_disk_failure_during_rebuild), nparity) * p_bit_rot);
+                        nparity --;
+                    }
+                    results.push([obj_size, p_loss.toString()]);
+		}
             }
 
-            $.plot("#placeholder", [results], {selection: {mode: "xy" }, 
+            $.plot("#placeholder", [results], {selection: {mode: "xy" },
                 xaxis: {
                     tickFormatter: function(val, axis) {
                         if ((val % 1000)  == 0) {
@@ -498,12 +557,12 @@
                    }
                 }
             });
-    
+
             $("#placeholder").bind("plothover");
-            
+
             // Shorten the mantisse and apply a little bit of style
             p_loss = "" + format_p(p_loss);
-           
+
             // Add maximum loss probability to text
             document.getElementById("p_max").innerHTML = p_loss.toString();
         };
