@@ -45,15 +45,15 @@
                 </div>
                 <div class="form-group">
                     <label for="replicas" id="replicas_label" class="col-lg-6 control-label">Number of replicas:</label>
-                    <div class="col-lg-3">
+                    <div class="col-lg-3" id="replicas_div">
                         <input type="number" id="replicas" value="3" min=1 class="form-control" onchange="calculate_probability()">
-                    </div>
+		    </div>
                     <label for="ndata" id="ndata_label" class="col-lg-6 control-label">Number of data fragments:</label>
-                    <div class="col-lg-3">
-                        <input type="number" id="ndata" value="3" min=1 class="form-control" onchange="calculate_probability()">
+                    <div class="col-lg-3" id="ndata_div">
+                        <input type="number" id="ndata" value="6" min=1 class="form-control" onchange="calculate_probability()">
                     </div>
                     <label for="nparity" id="nparity_label" class="col-lg-6 control-label">Number of parity fragments:</label>
-                    <div class="col-lg-3">
+                    <div class="col-lg-3" id="nparity_div">
                         <input type="number" id="nparity" value="3" min=1 class="form-control" onchange="calculate_probability()">
                     </div>
                 </div>
@@ -192,7 +192,10 @@
             </table>
 
             <hr />
+	    Replication (3 replicas):
+            <hr />
 
+	    <!-- Replication Case -->
             <math xmlns="http://www.w3.org/1998/Math/MathML">
                 <msub>
                     <mi>p</mi>
@@ -465,7 +468,440 @@
             </math>
 
 
+            <hr />
+            Erasure Code (ndata=6, nparity=3):
+            <hr />
+	    <!-- EC Case -->
 
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>p</mi>
+		    <mrow><mi>loss</mi></mrow>
+                </msub>
+
+                <mo> = </mo>
+
+                <!-- 1st fragment -->
+                <munder>
+                    <mrow>
+                    <mo>(</mo>
+
+
+                <mover>
+                    <mrow>
+                    <msub>
+                        <mrow>
+                        <mn>9</mn>
+                        <mo>&sdot;</mo>
+                        <mi>p</mi>
+                        </mrow>
+                        <mrow><mi>AFR</mi></mrow>
+                    </msub>
+                    <msup>
+                        <mrow>
+                            <mo>&sdot;</mo>
+                            <mi>(1</mi>
+                            <mo> - </mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>AFR</mi>
+                            </msub>
+                            <mo> ) </mo>
+                        </mrow>
+                        <mrow>
+                        <mi>8</mi>
+                        </mrow>
+                    </msup>
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>1 out of 9 disks failed</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                </mover>
+
+                    <mo>+</mo>
+
+                    <mover>
+                    <mrow>
+                    <msup>
+                    <mrow>
+                    <mo>(</mo>
+                    <mn>1</mn>
+                    <mo>-</mo>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow><mi>AFR</mi></mrow>
+                    </msub>
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                    <mn>9</mn>
+                    </msup>
+
+                    <mo>&sdot;</mo>
+                     <msub>
+                        <mi>p</mi>
+                        <mrow><mi>BER</mi></mrow>
+                    </msub>
+
+                    <mo>&sdot;</mo>
+                    <mn>8</mn>
+                    <mo>&sdot;</mo>
+                    <mi>s</mi>
+
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>Unrecoverable Read Error</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                    </mover>
+
+
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <munder>
+                            <mrow>
+                                <mo>&UnderBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>1st fragment loss</mtext>
+                            </mrow>
+                        </munder>
+                    </mrow>
+                </munder>
+
+                <mo>&sdot;</mo>
+                <!-- 2rd fragment -->
+
+                <munder>
+                    <mrow>
+                    <mo>(</mo>
+
+                <mover>
+                    <mrow>
+                    <msub>
+                        <mrow>
+                        <mn>8</mn>
+                        <mo>&sdot;</mo>
+                        <mi>p</mi>
+                        </mrow>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <msup>
+                        <mrow>
+                            <mo>&sdot;</mo>
+                            <mi>(1</mi>
+                            <mo> - </mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>AFR</mi>
+                            </msub>
+                            <mo> ) </mo>
+                        </mrow>
+                        <mrow>
+                        <mi>7</mi>
+                        </mrow>
+                    </msup>
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>1 out of 8 disks failed</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                </mover>
+
+                    <mo>+</mo>
+
+                    <mover>
+                    <mrow>
+                    <msup>
+                    <mrow>
+                    <mo>(</mo>
+                    <mn>1</mn>
+                    <mo>-</mo>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <mn>8</mn>
+                    </mrow>
+                    </msup>
+
+                    <mo>&sdot;</mo>
+                     <msub>
+                        <mi>p</mi>
+                        <mrow><mi>BER</mi></mrow>
+                    </msub>
+
+                    <mo>&sdot;</mo>
+                    <mn>8</mn>
+                    <mo>&sdot;</mo>
+                    <mi>s</mi>
+
+
+
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>Unrecoverable Read Error</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                    </mover>
+
+
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <munder>
+                            <mrow>
+                                <mo>&UnderBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>2nd fragment loss</mtext>
+                            </mrow>
+                        </munder>
+                    </mrow>
+                </munder>
+
+                <mo>&sdot;</mo>
+                <!-- 3rd fragment -->
+
+                <munder>
+                    <mrow>
+                    <mo>(</mo>
+
+                <mover>
+                    <mrow>
+                    <msub>
+                        <mrow>
+                        <mn>7</mn>
+                        <mo>&sdot;</mo>
+                        <mi>p</mi>
+                        </mrow>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <msup>
+                        <mrow>
+                            <mo>&sdot;</mo>
+                            <mi>(1</mi>
+                            <mo> - </mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>AFR</mi>
+                            </msub>
+                            <mo> ) </mo>
+                        </mrow>
+                        <mrow>
+                        <mi>6</mi>
+                        </mrow>
+                    </msup>
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>1 out of 7 disks failed</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                </mover>
+
+                    <mo>+</mo>
+
+                    <mover>
+                    <mrow>
+                    <msup>
+                    <mrow>
+                    <mo>(</mo>
+                    <mn>1</mn>
+                    <mo>-</mo>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <mn>7</mn>
+                    </mrow>
+                    </msup>
+
+                    <mo>&sdot;</mo>
+                     <msub>
+                        <mi>p</mi>
+                        <mrow><mi>BER</mi></mrow>
+                    </msub>
+
+                    <mo>&sdot;</mo>
+                    <mn>8</mn>
+                    <mo>&sdot;</mo>
+                    <mi>s</mi>
+
+
+
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>Unrecoverable Read Error</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                    </mover>
+
+
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <munder>
+                            <mrow>
+                                <mo>&UnderBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>3nd fragment loss</mtext>
+                            </mrow>
+                        </munder>
+                    </mrow>
+                </munder>
+
+                <mo>&sdot;</mo>
+                <!-- 4th fragment -->
+
+                <munder>
+                    <mrow>
+                    <mo>(</mo>
+
+                <mover>
+                    <mrow>
+                    <msub>
+                        <mrow>
+                        <mn>6</mn>
+                        <mo>&sdot;</mo>
+                        <mi>p</mi>
+                        </mrow>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <msup>
+                        <mrow>
+                            <mo>&sdot;</mo>
+                            <mi>(1</mi>
+                            <mo> - </mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>AFR</mi>
+                            </msub>
+                            <mo> ) </mo>
+                        </mrow>
+                        <mrow>
+                        <mi>5</mi>
+                        </mrow>
+                    </msup>
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>1 out of 6 disks failed</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                </mover>
+
+                    <mo>+</mo>
+
+                    <mover>
+                    <mrow>
+                    <msup>
+                    <mrow>
+                    <mo>(</mo>
+                    <mn>1</mn>
+                    <mo>-</mo>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <mn>6</mn>
+                    </mrow>
+                    </msup>
+
+                    <mo>&sdot;</mo>
+                     <msub>
+                        <mi>p</mi>
+                        <mrow><mi>BER</mi></mrow>
+                    </msub>
+
+                    <mo>&sdot;</mo>
+                    <mn>8</mn>
+                    <mo>&sdot;</mo>
+                    <mi>s</mi>
+
+
+
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>Unrecoverable Read Error</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                    </mover>
+
+
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <munder>
+                            <mrow>
+                                <mo>&UnderBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>4th fragment loss</mtext>
+                            </mrow>
+                        </munder>
+                    </mrow>
+                </munder>
+
+            </math>
 
     </div>
     <hr />
@@ -479,9 +915,11 @@
 		    if (display_elements.indexOf(element)>=0){
                         document.getElementById(element).style.display = '';
                         document.getElementById(element+'_label').style.display = '';
+                        document.getElementById(element+'_div').style.display = '';
 		    }else{
                         document.getElementById(element).style.display = 'none';
                         document.getElementById(element+'_label').style.display = 'none';
+                        document.getElementById(element+'_div').style.display = 'none';
 		    }
 
             }
