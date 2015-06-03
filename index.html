@@ -38,12 +38,29 @@
             <form class="form-horizontal" role="form">
 
                 <div class="form-group">
-                    <label for="replicas" class="col-lg-6 control-label">Number of replicas:</label>
+                    <label for="policy" class="col-lg-6 control-label">Policy</label>
                     <div class="col-lg-3">
-                        <input type="number" id="replicas" value="3" min=1 class="form-control" onchange="calculate_probability()">
+                    <select id="policy" onchange="calculate_probability()">
+                        <option value="replica-policy" selected>Replica</option>
+                        <option value="ec-policy">ErasureCode</option>
+                    </select>
                     </div>
                 </div>
-           
+                <div class="form-group">
+                    <label for="replicas" id="replicas_label" class="col-lg-6 control-label">Number of replicas:</label>
+                    <div class="col-lg-3" id="replicas_div">
+                        <input type="number" id="replicas" value="3" min=1 class="form-control" onchange="calculate_probability()">
+		    </div>
+                    <label for="ndata" id="ndata_label" class="col-lg-6 control-label">Number of data fragments:</label>
+                    <div class="col-lg-3" id="ndata_div">
+                        <input type="number" id="ndata" value="6" min=1 class="form-control" onchange="calculate_probability()">
+                    </div>
+                    <label for="nparity" id="nparity_label" class="col-lg-6 control-label">Number of parity fragments:</label>
+                    <div class="col-lg-3" id="nparity_div">
+                        <input type="number" id="nparity" value="3" min=1 class="form-control" onchange="calculate_probability()">
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="p_disk_failure_year" class="col-lg-6 control-label">Disk failure rate per year (in %):</label>
                     <div class="col-lg-3">
@@ -58,7 +75,7 @@
                     specify a much higher MTBF, however in reality you will most
                     likely see much higher disk failures per year.</p>
                 </div>
- 
+
 
                 <div class="form-group">
                     <label for="rebuild_time" class="col-lg-6 control-label">Rebuild time (hours):</label>
@@ -88,7 +105,7 @@
                     increases with the object size. Modern drives have a
                     specified bit error rate as low as 1e-15 or even 1e-16.</p>
                 </div>
- 
+
             </form>
         </div>
 
@@ -178,7 +195,10 @@
             </table>
 
             <hr />
+	    Replication (3 replicas):
+            <hr />
 
+	    <!-- Replication Case -->
             <math xmlns="http://www.w3.org/1998/Math/MathML">
                 <msub>
                     <mi>p</mi>
@@ -451,40 +471,524 @@
             </math>
 
 
+            <hr />
+            Erasure Code (ndata=6, nparity=3):
+            <hr />
+	    <!-- EC Case -->
 
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>p</mi>
+		    <mrow><mi>loss</mi></mrow>
+                </msub>
+
+                <mo> = </mo>
+
+                <!-- 1st fragment -->
+                <munder>
+                    <mrow>
+                    <mo>(</mo>
+
+
+                <mover>
+                    <mrow>
+                    <msub>
+                        <mrow>
+                        <mn>9</mn>
+                        <mo>&sdot;</mo>
+                        <mi>p</mi>
+                        </mrow>
+                        <mrow><mi>AFR</mi></mrow>
+                    </msub>
+                    <msup>
+                        <mrow>
+                            <mo>&sdot;</mo>
+                            <mi>(1</mi>
+                            <mo> - </mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>AFR</mi>
+                            </msub>
+                            <mo> ) </mo>
+                        </mrow>
+                        <mrow>
+                        <mi>8</mi>
+                        </mrow>
+                    </msup>
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>1 out of 9 disks failed</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                </mover>
+
+                    <mo>+</mo>
+
+                    <mover>
+                    <mrow>
+                    <msup>
+                    <mrow>
+                    <mo>(</mo>
+                    <mn>1</mn>
+                    <mo>-</mo>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow><mi>AFR</mi></mrow>
+                    </msub>
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                    <mn>9</mn>
+                    </msup>
+
+                    <mo>&sdot;</mo>
+                     <msub>
+                        <mi>p</mi>
+                        <mrow><mi>BER</mi></mrow>
+                    </msub>
+
+                    <mo>&sdot;</mo>
+                    <mn>8</mn>
+                    <mo>&sdot;</mo>
+                    <mi>s</mi>
+
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>Unrecoverable Read Error</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                    </mover>
+
+
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <munder>
+                            <mrow>
+                                <mo>&UnderBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>1st fragment loss</mtext>
+                            </mrow>
+                        </munder>
+                    </mrow>
+                </munder>
+
+                <mo>&sdot;</mo>
+                <!-- 2rd fragment -->
+
+                <munder>
+                    <mrow>
+                    <mo>(</mo>
+
+                <mover>
+                    <mrow>
+                    <msub>
+                        <mrow>
+                        <mn>8</mn>
+                        <mo>&sdot;</mo>
+                        <mi>p</mi>
+                        </mrow>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <msup>
+                        <mrow>
+                            <mo>&sdot;</mo>
+                            <mi>(1</mi>
+                            <mo> - </mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>AFR</mi>
+                            </msub>
+                            <mo> ) </mo>
+                        </mrow>
+                        <mrow>
+                        <mi>7</mi>
+                        </mrow>
+                    </msup>
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>1 out of 8 disks failed</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                </mover>
+
+                    <mo>+</mo>
+
+                    <mover>
+                    <mrow>
+                    <msup>
+                    <mrow>
+                    <mo>(</mo>
+                    <mn>1</mn>
+                    <mo>-</mo>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <mn>8</mn>
+                    </mrow>
+                    </msup>
+
+                    <mo>&sdot;</mo>
+                     <msub>
+                        <mi>p</mi>
+                        <mrow><mi>BER</mi></mrow>
+                    </msub>
+
+                    <mo>&sdot;</mo>
+                    <mn>8</mn>
+                    <mo>&sdot;</mo>
+                    <mi>s</mi>
+
+
+
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>Unrecoverable Read Error</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                    </mover>
+
+
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <munder>
+                            <mrow>
+                                <mo>&UnderBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>2nd fragment loss</mtext>
+                            </mrow>
+                        </munder>
+                    </mrow>
+                </munder>
+
+                <mo>&sdot;</mo>
+                <!-- 3rd fragment -->
+
+                <munder>
+                    <mrow>
+                    <mo>(</mo>
+
+                <mover>
+                    <mrow>
+                    <msub>
+                        <mrow>
+                        <mn>7</mn>
+                        <mo>&sdot;</mo>
+                        <mi>p</mi>
+                        </mrow>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <msup>
+                        <mrow>
+                            <mo>&sdot;</mo>
+                            <mi>(1</mi>
+                            <mo> - </mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>AFR</mi>
+                            </msub>
+                            <mo> ) </mo>
+                        </mrow>
+                        <mrow>
+                        <mi>6</mi>
+                        </mrow>
+                    </msup>
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>1 out of 7 disks failed</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                </mover>
+
+                    <mo>+</mo>
+
+                    <mover>
+                    <mrow>
+                    <msup>
+                    <mrow>
+                    <mo>(</mo>
+                    <mn>1</mn>
+                    <mo>-</mo>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <mn>7</mn>
+                    </mrow>
+                    </msup>
+
+                    <mo>&sdot;</mo>
+                     <msub>
+                        <mi>p</mi>
+                        <mrow><mi>BER</mi></mrow>
+                    </msub>
+
+                    <mo>&sdot;</mo>
+                    <mn>8</mn>
+                    <mo>&sdot;</mo>
+                    <mi>s</mi>
+
+
+
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>Unrecoverable Read Error</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                    </mover>
+
+
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <munder>
+                            <mrow>
+                                <mo>&UnderBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>3nd fragment loss</mtext>
+                            </mrow>
+                        </munder>
+                    </mrow>
+                </munder>
+
+                <mo>&sdot;</mo>
+                <!-- 4th fragment -->
+
+                <munder>
+                    <mrow>
+                    <mo>(</mo>
+
+                <mover>
+                    <mrow>
+                    <msub>
+                        <mrow>
+                        <mn>6</mn>
+                        <mo>&sdot;</mo>
+                        <mi>p</mi>
+                        </mrow>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <msup>
+                        <mrow>
+                            <mo>&sdot;</mo>
+                            <mi>(1</mi>
+                            <mo> - </mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>AFR</mi>
+                            </msub>
+                            <mo> ) </mo>
+                        </mrow>
+                        <mrow>
+                        <mi>5</mi>
+                        </mrow>
+                    </msup>
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>1 out of 6 disks failed</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                </mover>
+
+                    <mo>+</mo>
+
+                    <mover>
+                    <mrow>
+                    <msup>
+                    <mrow>
+                    <mo>(</mo>
+                    <mn>1</mn>
+                    <mo>-</mo>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow><mi>RFR</mi></mrow>
+                    </msub>
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <mn>6</mn>
+                    </mrow>
+                    </msup>
+
+                    <mo>&sdot;</mo>
+                     <msub>
+                        <mi>p</mi>
+                        <mrow><mi>BER</mi></mrow>
+                    </msub>
+
+                    <mo>&sdot;</mo>
+                    <mn>8</mn>
+                    <mo>&sdot;</mo>
+                    <mi>s</mi>
+
+
+
+                    </mrow>
+                    <mrow>
+                        <mover>
+                            <mrow>
+                                <mo>&OverBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>Unrecoverable Read Error</mtext>
+                            </mrow>
+                        </mover>
+                    </mrow>
+                    </mover>
+
+
+                    <mo>)</mo>
+                    </mrow>
+                    <mrow>
+                        <munder>
+                            <mrow>
+                                <mo>&UnderBrace;</mo>
+                            </mrow>
+                            <mrow>
+                            <mtext>4th fragment loss</mtext>
+                            </mrow>
+                        </munder>
+                    </mrow>
+                </munder>
+
+            </math>
 
     </div>
     <hr />
     </div>
 
     <script>
+        function toggle_input_element(display_elements){
+	    input_elements = ["replicas", "ndata", "nparity"];
+            for (var i=0; i < input_elements.length; i++){
+		    element = input_elements[i];
+		    if (display_elements.indexOf(element)>=0){
+                        document.getElementById(element).style.display = '';
+                        document.getElementById(element+'_label').style.display = '';
+                        document.getElementById(element+'_div').style.display = '';
+		    }else{
+                        document.getElementById(element).style.display = 'none';
+                        document.getElementById(element+'_label').style.display = 'none';
+                        document.getElementById(element+'_div').style.display = 'none';
+		    }
+
+            }
+        }
+        function change_policy(policy) {
+	    switch(policy){
+		case 'replica-policy':
+		    toggle_input_element(["replicas"]);
+                    break;
+		case 'ec-policy':
+		    toggle_input_element(["ndata", "nparity"]);
+                    break;
+	    }
+	}
+
         function calculate_probability() {
+            policy = document.getElementById("policy").value;
+            change_policy(policy);
             rebuild_time = document.getElementById("rebuild_time").value;
             replicas = document.getElementById("replicas").value;
             p_disk_failure_year = document.getElementById("p_disk_failure_year").value;
-    
+
             p_disk_failure_year = p_disk_failure_year/100;
             p_disk_failure_during_rebuild = p_disk_failure_year/8760*rebuild_time;
-    
+
             var results = [];
-            
+
             ber = document.getElementById("ber").value;
-    
+
             for (obj_size=0;obj_size<=5000;obj_size+=100){
-                replicas = document.getElementById("replicas").value;
-                p_bit_rot = 1 - Math.pow((1-ber), 8 * obj_size*1000*1000);
-                p_disk_failure = replicas * p_disk_failure_year * Math.pow((1-p_disk_failure_year), replicas-1)
-                p_loss = p_disk_failure + Math.pow((1 - p_disk_failure_year), replicas) * p_bit_rot;
-                replicas --;
-                while (replicas >= 1) { 
-                    p_disk_failure = replicas * p_disk_failure_during_rebuild * Math.pow((1-p_disk_failure_during_rebuild), replicas-1)
-                    p_loss *= (p_disk_failure + Math.pow((1 - p_disk_failure_during_rebuild), replicas) * p_bit_rot);
-                    replicas --;
+                    switch (policy){
+		        // Replica case
+		        case "replica-policy":
+                            replicas = document.getElementById("replicas").value;
+                            p_bit_rot = 1 - Math.pow((1-ber), 8 * obj_size*1000*1000);
+                            p_disk_failure = replicas * p_disk_failure_year * Math.pow((1-p_disk_failure_year), replicas-1)
+                            p_loss = p_disk_failure + Math.pow((1 - p_disk_failure_year), replicas) * p_bit_rot;
+                            replicas --;
+                            while (replicas >= 1) {
+                                p_disk_failure = replicas * p_disk_failure_during_rebuild * Math.pow((1-p_disk_failure_during_rebuild), replicas-1)
+                                p_loss *= (p_disk_failure + Math.pow((1 - p_disk_failure_during_rebuild), replicas) * p_bit_rot);
+                                replicas --;
+                            }
+                            results.push([obj_size, p_loss.toString()]);
+			    break;
+                         // EC case
+                         case "ec-policy":
+                             ndata = document.getElementById("ndata").value;
+                             nparity = document.getElementById("nparity").value;
+                             total = ndata + nparity;
+                             p_bit_rot = 1 - Math.pow((1-ber), 8 * obj_size*1000*1000);
+                             p_disk_failure = total * p_disk_failure_year * Math.pow((1-p_disk_failure_year), total-1)
+                             p_loss = p_disk_failure + Math.pow((1 - p_disk_failure_year), nparity) * p_bit_rot;
+                             nparity --;
+                             while (nparity >= 0) {
+                                 total = ndata + nparity;
+                                 p_disk_failure = total * p_disk_failure_during_rebuild * Math.pow((1-p_disk_failure_during_rebuild), total-1)
+                                 p_loss *= (p_disk_failure + Math.pow((1 - p_disk_failure_during_rebuild), nparity) * p_bit_rot);
+                                 nparity --;
+                             }
+                             results.push([obj_size, p_loss.toString()]);
+                             break;
                 }
-                results.push([obj_size, p_loss.toString()]);
             }
 
-            $.plot("#placeholder", [results], {selection: {mode: "xy" }, 
+            $.plot("#placeholder", [results], {selection: {mode: "xy" },
                 xaxis: {
                     tickFormatter: function(val, axis) {
                         if ((val % 1000)  == 0) {
@@ -501,12 +1005,12 @@
                    }
                 }
             });
-    
+
             $("#placeholder").bind("plothover");
-            
+
             // Shorten the mantisse and apply a little bit of style
             p_loss = "" + format_p(p_loss);
-           
+
             // Add maximum loss probability to text
             document.getElementById("p_max").innerHTML = p_loss.toString();
         };
