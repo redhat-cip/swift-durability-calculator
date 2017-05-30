@@ -23,13 +23,13 @@
         <hr />
         <p>This tool can help to choose the required amount of replicas in a
         Swift cluster, based on the wanted object durability. If you need a
-        lower risk to loose an object, you can increase the number of replicas
+        lower risk to lose an object, you can increase the number of replicas
         for objects in your cluster. You can even use different number of
         replicas for different classes of data using <a
         href="http://docs.openstack.org/developer/swift/overview_policies.html">Swift
         Storage Policies</a>.</p>
         <p>With the choosen parameters (see below), the calculated probability
-        to loose one object of 5GB size in a year is: <span id="p_max"></span>.
+        to lose one object of 5GB size in a year is: <span id="p_max"></span>.
         <hr />
         </div>
 
@@ -84,7 +84,7 @@
                 <div class="form-group">
                     <p class="help-block col-lg-12">The bit error rate is the
                     probability for an unrecoverable error per bit read. This is
-                    also the reason why the probability to loose an object
+                    also the reason why the probability to lose an object
                     increases with the object size. Modern drives have a
                     specified bit error rate as low as 1e-15 or even 1e-16.</p>
                 </div>
